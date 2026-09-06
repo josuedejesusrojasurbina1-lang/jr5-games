@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>jr5 colors</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f0f4f8;color:#1e293b;height:100vh;overflow:hidden}
+
+#home{position:absolute;inset:0;display:flex;flex-direction:column;background:#f8fafc;z-index:50;transition:opacity .3s,transform .3s}
+#home.hidden{opacity:0;pointer-events:none;transform:scale(.97)}
+.home-header{background:linear-gradient(135deg,#e94560 0%,#ff6b8a 50%,#ff9ff3 100%);padding:24px 20px 32px;color:#fff;text-align:center;box-shadow:0 6px 24px rgba(233,69,96,.35)}
+.home-header h1{font-size:2rem;font-weight:800;letter-spacing:-.6px;text-shadow:0 2px 8px rgba(0,0,0,.15)}
+.home-header p{font-size:.95rem;opacity:.95;margin-top:6px}
+.gallery{flex:1;overflow-y:auto;padding:18px 14px 50px;display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px}
+.card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.09);cursor:pointer;transition:transform .18s}
+.card:active{transform:scale(.95)}
+.card-preview{height:130px;display:flex;align-items:center;justify-content:center;font-size:3.3rem;background:linear-gradient(160deg,#f8fafc,#e2e8f0)}
+.card-info{padding:11px 13px}
+.card-info h3{font-size:.92rem;font-weight:700;margin-bottom:2px}
+.card-info span{font-size:.72rem;color:#64748b}
+
+#game{position:absolute;inset:0;display:none;flex-direction:column}
+#game.active{display:flex}
+.topbar{background:#fff;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 14px rgba(0,0,0,.07);z-index:20}
+.back-btn,.icon-btn{width:42px;height:42px;border:none;border-radius:50%;background:#f1f5f9;font-size:1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.top-title{font-weight:700;font-size:1.05rem;color:#e94560}
+.top-actions{display:flex;gap:6px}
+
+.canvas-wrap{flex:1;position:relative;overflow:hidden;background:#dde4ed;display:flex;align-items:center;justify-content:center}
+#cv{background:#fff;border-radius:14px;box-shadow:0 14px 45px rgba(0,0,0,.15);touch-action:none;cursor:grab}
+#cv:active{cursor:grabbing}
+
+/* Botón Empezar */
+.start-overlay{
+  position:absolute;inset:0;background:rgba(15,23,42,.45);
+  display:flex;align-items:center;justify-content:center;z-index:30;
+  transition:opacity .35s;
+}
+.start-overlay.hidden{opacity:0;pointer-events:none}
+.start-btn{
+  background:linear-gradient(135deg,#e94560,#ff6b8a);
+  color:#fff;border:none;padding:16px 36px;border-radius:40px;
+  font-size:1.15rem;font-weight:700;cursor:pointer;
+  box-shadow:0 10px 30px rgba(233,69,96,.5);
+  display:flex;align-items:center;gap:10px;
+}
+.start-btn:active{transform:scale(.96)}
+
+.progress-box{background:#fff;padding:9px 16px 5px}
+.bar{height:7px;background:#e2e8f0;border-radius:4px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,#10b981,#059669);width:0%;transition:width .4s}
+.prog-text{font-size:.76rem;color:#64748b;text-align:center;margin-top:4px}
+
+.palette-box{background:#fff;padding:13px 6px 20px;box-shadow:0 -8px 28px rgba(0,0,0,.08);z-index:20}
+.palette{display:flex;gap:11px;overflow-x:auto;padding:5px 10px;scrollbar-width:none}
+.palette::-webkit-scrollbar{display:none}
+.swatch{flex-shrink:0;width:58px;height:58px;border-radius:50%;border:3.5px solid transparent;position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.18rem;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55);box-shadow:0 5px 14px rgba(0,0,0,.2);transition:transform .15s}
+.swatch:active{transform:scale(.9)}
+.swatch.on{border-color:#0f172a;transform:scale(1.13);box-shadow:0 0 0 3.5px #e94560,0 7px 18px rgba(0,0,0,.28)}
+.swatch.done{opacity:.36;pointer-events:none;filter:grayscale(.3)}
+.swatch .chk{position:absolute;top:-4px;right:-4px;width:21px;height:21px;background:#10b981;border-radius:50%;font-size:12px;display:none;align-items:center;justify-content:center;color:#fff;border:2.5px solid #fff;font-weight:700}
+.swatch.done .chk{display:flex}
+
+.toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,.93);color:#fff;padding:12px 26px;border-radius:40px;font-size:.92rem;font-weight:500;opacity:0;pointer-events:none;transition:opacity .28s;z-index:100}
+.toast.show{opacity:1}
+
+.complete-overlay{position:absolute;inset:0;background:rgba(15,23,42,.6);display:none;align-items:center;justify-content:center;z-index:40}
+.complete-overlay.show{display:flex}
+.complete-card{background:#fff;border-radius:26px;padding:34px 30px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3);max-width:310px}
+.complete-card h2{font-size:1.55rem;margin-bottom:8px;color:#e94560}
+.complete-card p{color:#64748b;margin-bottom:22px;font-size:.95rem}
+.complete-card button{background:linear-gradient(135deg,#e94560,#ff6b8a);color:#fff;border:none;padding:13px 32px;border-radius:32px;font-size:1.02rem;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(233,69,96,.4)}
+</style>
+</head>
+<body>
+
+<div id="home">
+  <div class="home-header">
+    <h1>jr5 colors</h1>
+    <p>Colorea por números • Relájate y crea</p>
+  </div>
+  <div class="gallery" id="gallery"></div>
+</div>
+
+<div id="game">
+  <div class="topbar">
+    <button class="back-btn" id="backBtn">←</button>
+    <div class="top-title" id="pageTitle">Corazón</div>
+    <div class="top-actions">
+      <button class="icon-btn" id="hintBtn">💡</button>
+      <button class="icon-btn" id="undoBtn">↩️</button>
+      <button class="icon-btn" id="resetBtn">🔄</button>
+    </div>
+  </div>
+
+  <div class="canvas-wrap" id="canvasWrap">
+    <canvas id="cv"></canvas>
+
+    <!-- Overlay de preview + botón Empezar -->
+    <div class="start-overlay" id="startOverlay">
+      <button class="start-btn" id="startBtn">🎨 Empezar a colorear</button>
+    </div>
+
+    <div class="complete-overlay" id="completeOverlay">
+      <div class="complete-card">
+        <h2>🎉 ¡Completado!</h2>
+        <p>Has terminado esta imagen con éxito</p>
+        <button id="backHomeBtn">Volver al inicio</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-box">
+    <div class="bar"><div class="fill" id="progFill"></div></div>
+    <div class="prog-text" id="progText">0% completado</div>
+  </div>
+
+  <div class="palette-box">
+    <div class="palette" id="palette"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const pages = [
+  {name:"❤️ Corazón",emoji:"❤️",colors:[{id:1,hex:"#e94560"},{id:2,hex:"#ff6b8a"},{id:3,hex:"#ff9ff3"},{id:4,hex:"#54a0ff"},{id:5,hex:"#1dd1a1"},{id:6,hex:"#feca57"},{id:7,hex:"#5f27cd"}],
+   regions:[{n:1,d:"M250,150 C250,110 200,70 155,110 C110,150 145,255 250,360 C355,255 390,150 345,110 C300,70 250,110 250,150 Z"},{n:2,d:"M180,140 C165,120 145,130 150,155 C157,180 185,170 180,140 Z"},{n:3,d:"M320,140 C335,120 355,130 350,155 C343,180 315,170 320,140 Z"},{n:4,d:"M15,15 H485 V90 Q370,60 250,70 Q130,60 15,90 Z"},{n:5,d:"M15,410 H485 V485 H15 Z"},{n:6,d:"M15,90 H65 V410 H15 Z"},{n:6,d:"M435,90 H485 V410 H435 Z"},{n:7,d:"M95,195 C115,175 145,185 140,215 C125,230 100,220 95,195 Z"},{n:7,d:"M405,195 C385,175 355,185 360,215 C375,230 400,220 405,195 Z"}]},
+  {name:"🐱 Gato",emoji:"🐱",colors:[{id:1,hex:"#f8a5c2"},{id:2,hex:"#e84393"},{id:3,hex:"#574b90"},{id:4,hex:"#f5cd79"},{id:5,hex:"#63cdda"},{id:6,hex:"#e15f41"},{id:7,hex:"#2f3542"},{id:8,hex:"#ffa502"},{id:9,hex:"#7bed9f"}],
+   regions:[{n:7,d:"M15,15 H485 V485 H15 Z"},{n:1,d:"M250,125 C360,125 430,200 430,295 C430,390 360,465 250,465 C140,465 70,390 70,295 C70,200 140,125 250,125 Z"},{n:3,d:"M130,155 L80,45 L205,140 Z"},{n:3,d:"M370,155 L420,45 L295,140 Z"},{n:2,d:"M140,150 L105,80 L195,140 Z"},{n:2,d:"M360,150 L395,80 L305,140 Z"},{n:4,d:"M170,235 C170,210 195,195 220,210 C240,225 235,265 205,275 C175,265 170,255 170,235 Z"},{n:4,d:"M330,235 C330,210 305,195 280,210 C260,225 265,265 295,275 C325,265 330,255 330,235 Z"},{n:7,d:"M190,235 C190,225 200,220 210,225 C217,233 213,250 200,253 C187,250 190,245 190,235 Z"},{n:7,d:"M310,235 C310,225 300,220 290,225 C283,233 287,250 300,253 C313,250 310,245 310,235 Z"},{n:6,d:"M250,290 L225,320 L275,320 Z"},{n:6,d:"M230,325 Q250,355 270,325"},{n:5,d:"M125,305 C125,345 170,365 215,340 C185,315 145,300 125,305 Z"},{n:5,d:"M375,305 C375,345 330,365 285,340 C315,315 355,300 375,305 Z"},{n:8,d:"M135,295 L60,275"},{n:8,d:"M140,315 L65,320"},{n:8,d:"M365,295 L440,275"},{n:8,d:"M360,315 L435,320"},{n:9,d:"M215,170 C235,155 265,155 285,170 C265,185 235,185 215,170 Z"}]},
+  {name:"🌸 Flor",emoji:"🌸",colors:[{id:1,hex:"#ff6b81"},{id:2,hex:"#ff9ff3"},{id:3,hex:"#feca57"},{id:4,hex:"#1dd1a1"},{id:5,hex:"#54a0ff"},{id:6,hex:"#5f27cd"},{id:7,hex:"#ff9f43"}],
+   regions:[{n:5,d:"M15,15 H485 V485 H15 Z"},{n:1,d:"M250,125 C310,55 410,90 400,185 C375,260 285,240 250,125 Z"},{n:1,d:"M250,125 C360,175 410,290 310,360 C250,325 205,210 250,125 Z"},{n:2,d:"M250,125 C295,270 210,390 125,335 C70,235 175,160 250,125 Z"},{n:2,d:"M250,125 C170,95 70,170 105,280 C175,340 245,210 250,125 Z"},{n:1,d:"M250,125 C190,55 90,90 100,185 C125,260 215,240 250,125 Z"},{n:3,d:"M250,180 C290,180 325,215 325,255 C325,295 290,330 250,330 C210,330 175,295 175,255 C175,215 210,180 250,180 Z"},{n:4,d:"M242,330 L248,465 L258,465 L264,330 Z"},{n:4,d:"M270,390 C345,345 420,420 365,480 C305,445 280,420 270,390 Z"},{n:7,d:"M140,75 C180,35 240,65 225,125 C190,140 145,110 140,75 Z"},{n:6,d:"M395,410 C360,470 290,445 310,375 C350,360 390,390 395,410 Z"}]},
+  {name:"🏠 Casa",emoji:"🏠",colors:[{id:1,hex:"#e15f41"},{id:2,hex:"#f5cd79"},{id:3,hex:"#63cdda"},{id:4,hex:"#786fa6"},{id:5,hex:"#f8a5c2"},{id:6,hex:"#2f3542"},{id:7,hex:"#10ac84"},{id:8,hex:"#ff9f43"},{id:9,hex:"#70a1ff"}],
+   regions:[{n:3,d:"M15,15 H485 V180 H15 Z"},{n:1,d:"M55,180 L250,40 L445,180 Z"},{n:2,d:"M90,180 H410 V420 H90 Z"},{n:4,d:"M200,305 H300 V420 H200 Z"},{n:5,d:"M115,210 H190 V300 H115 Z"},{n:5,d:"M310,210 H385 V300 H310 Z"},{n:6,d:"M320,90 H385 V180 H320 Z"},{n:7,d:"M15,420 H485 V485 H15 Z"},{n:9,d:"M130,225 H175 V285 H130 Z"},{n:9,d:"M325,225 H370 V285 H325 Z"},{n:8,d:"M270,355 C270,345 280,340 285,350 C280,360 270,365 270,355 Z"}]},
+  {name:"⭐ Estrella",emoji:"⭐",colors:[{id:1,hex:"#feca57"},{id:2,hex:"#ff9f43"},{id:3,hex:"#54a0ff"},{id:4,hex:"#5f27cd"},{id:5,hex:"#1dd1a1"},{id:6,hex:"#ff6b6b"},{id:7,hex:"#ff9ff3"}],
+   regions:[{n:3,d:"M15,15 H485 V485 H15 Z"},{n:1,d:"M250,50 L310,200 L475,200 L340,300 L395,470 L250,360 L105,470 L160,300 L25,200 L190,200 Z"},{n:2,d:"M250,105 L295,220 L400,220 L320,285 L360,400 L250,330 L140,400 L180,285 L100,220 L205,220 Z"},{n:6,d:"M250,165 L280,230 L350,230 L300,275 L325,350 L250,305 L175,350 L200,275 L150,230 L220,230 Z"},{n:4,d:"M75,75 C125,25 195,65 170,140 C130,155 80,120 75,75 Z"},{n:5,d:"M415,405 C375,470 295,440 320,365 C365,350 410,380 415,405 Z"},{n:7,d:"M65,405 C100,360 170,385 150,445 C110,460 70,440 65,405 Z"}]},
+  {name:"🦄 Unicornio",emoji:"🦄",colors:[{id:1,hex:"#ff9ff3"},{id:2,hex:"#54a0ff"},{id:3,hex:"#feca57"},{id:4,hex:"#1dd1a1"},{id:5,hex:"#5f27cd"},{id:6,hex:"#ff6b6b"},{id:7,hex:"#f8a5c2"},{id:8,hex:"#70a1ff"}],
+   regions:[{n:2,d:"M15,15 H485 V485 H15 Z"},{n:1,d:"M165,205 C165,130 235,85 310,110 C375,140 405,215 375,290 C345,365 250,405 180,365 C125,330 165,270 165,205 Z"},{n:7,d:"M235,115 C280,60 350,90 330,165 C295,180 240,150 235,115 Z"},{n:3,d:"M280,80 L305,20 L330,80 L390,95 L335,130 L360,195 L305,160 L250,195 L275,130 L220,95 Z"},{n:5,d:"M225,205 C225,185 250,170 275,185 C295,200 285,240 255,250 C225,240 225,225 225,205 Z"},{n:6,d:"M245,205 C245,195 255,190 265,195 C272,205 265,225 255,228 C245,225 245,215 245,205 Z"},{n:8,d:"M285,255 C270,290 235,310 215,285 C235,265 265,250 285,255 Z"},{n:4,d:"M180,330 C220,400 310,430 370,370 C325,335 250,315 180,330 Z"},{n:1,d:"M185,155 C175,120 205,100 225,130 C215,150 195,155 185,155 Z"}]},
+  {name:"🐶 Perrito",emoji:"🐶",colors:[{id:1,hex:"#f5cd79"},{id:2,hex:"#e1b12c"},{id:3,hex:"#574b90"},{id:4,hex:"#63cdda"},{id:5,hex:"#e15f41"},{id:6,hex:"#2f3542"},{id:7,hex:"#ff9ff3"},{id:8,hex:"#7bed9f"}],
+   regions:[{n:6,d:"M15,15 H485 V485 H15 Z"},{n:1,d:"M250,140 C355,140 420,215 420,310 C420,400 355,460 250,460 C145,460 80,400 80,310 C80,215 145,140 250,140 Z"},{n:2,d:"M130,175 L70,70 L200,160 Z"},{n:2,d:"M370,175 L430,70 L300,160 Z"},{n:3,d:"M145,170 L100,95 L190,155 Z"},{n:3,d:"M355,170 L400,95 L310,155 Z"},{n:4,d:"M175,250 C175,225 200,210 225,225 C245,240 240,280 210,290 C180,280 175,270 175,250 Z"},{n:4,d:"M325,250 C325,225 300,210 275,225 C255,240 260,280 290,290 C320,280 325,270 325,250 Z"},{n:6,d:"M195,250 C195,240 205,235 215,240 C222,248 218,265 205,268 C192,265 195,260 195,250 Z"},{n:6,d:"M305,250 C305,240 295,235 285,240 C278,248 282,265 295,268 C308,265 305,260 305,250 Z"},{n:5,d:"M250,310 L225,345 L275,345 Z"},{n:7,d:"M140,320 C140,360 180,380 225,355 C190,330 155,315 140,320 Z"},{n:7,d:"M360,320 C360,360 320,380 275,355 C310,330 345,315 360,320 Z"},{n:8,d:"M210,185 C230,170 270,170 290,185 C270,200 230,200 210,185 Z"}]},
+  {name:"🍦 Helado",emoji:"🍦",colors:[{id:1,hex:"#ff9ff3"},{id:2,hex:"#feca57"},{id:3,hex:"#ff6b81"},{id:4,hex:"#54a0ff"},{id:5,hex:"#1dd1a1"},{id:6,hex:"#e1b12c"},{id:7,hex:"#5f27cd"}],
+   regions:[{n:4,d:"M15,15 H485 V485 H15 Z"},{n:1,d:"M180,160 C180,100 230,70 280,90 C330,110 350,170 320,220 C290,270 220,280 180,230 C150,190 180,170 180,160 Z"},{n:2,d:"M200,200 C200,160 240,140 280,155 C310,170 320,210 295,245 C270,275 220,280 200,245 C180,215 200,210 200,200 Z"},{n:3,d:"M220,230 C220,205 250,190 280,205 C300,220 295,255 270,270 C245,280 220,265 220,230 Z"},{n:6,d:"M210,275 L250,460 L290,275 Z"},{n:5,d:"M230,300 L250,420 L270,300 Z"},{n:7,d:"M160,120 C190,90 230,105 220,145 C195,155 165,140 160,120 Z"},{n:7,d:"M320,130 C350,100 390,120 370,160 C345,170 325,155 320,130 Z"}]},
+  {name:"🦋 Mariposa",emoji:"🦋",colors:[{id:1,hex:"#ff6b81"},{id:2,hex:"#54a0ff"},{id:3,hex:"#feca57"},{id:4,hex:"#1dd1a1"},{id:5,hex:"#5f27cd"},{id:6,hex:"#ff9ff3"},{id:7,hex:"#2f3542"}],
+   regions:[{n:5,d:"M15,15 H485 V485 H15 Z"},{n:1,d:"M250,200 C150,100 60,150 80,250 C100,340 180,320 250,250 Z"},{n:2,d:"M250,200 C350,100 440,150 420,250 C400,340 320,320 250,250 Z"},{n:6,d:"M250,250 C160,280 100,360 140,420 C190,450 240,380 250,320 Z"},{n:3,d:"M250,250 C340,280 400,360 360,420 C310,450 260,380 250,320 Z"},{n:7,d:"M245,180 L250,320 L255,180 Z"},{n:4,d:"M230,160 C230,140 250,130 260,145 C255,165 235,170 230,160 Z"},{n:4,d:"M270,160 C270,140 250,130 240,145 C245,165 265,170 270,160 Z"}]},
+  {name:"🚗 Coche",emoji:"🚗",colors:[{id:1,hex:"#e94560"},{id:2,hex:"#54a0ff"},{id:3,hex:"#2f3542"},{id:4,hex:"#feca57"},{id:5,hex:"#1dd1a1"},{id:6,hex:"#ff9ff3"},{id:7,hex:"#70a1ff"}],
+   regions:[{n:5,d:"M15,15 H485 V485 H15 Z"},{n:1,d:"M80,280 L120,200 L220,180 L300,120 L420,120 L460,200 L470,280 Z"},{n:2,d:"M230,185 L300,130 L410,130 L445,195 L230,195 Z"},{n:7,d:"M310,135 L400,135 L430,190 L310,190 Z"},{n:3,d:"M140,280 C140,240 180,220 210,240 C230,260 220,300 180,310 C150,305 140,295 140,280 Z"},{n:3,d:"M360,280 C360,240 400,220 430,240 C450,260 440,300 400,310 C370,305 360,295 360,280 Z"},{n:4,d:"M450,230 C450,215 465,210 470,225 C465,240 450,245 450,230 Z"},{n:6,d:"M15,320 H485 V400 H15 Z"}]},
+  {name:"🌙 Luna",emoji:"🌙",colors:[{id:1,hex:"#feca57"},{id:2,hex:"#ff9f43"},{id:3,hex:"#5f27cd"},{id:4,hex:"#54a0ff"},{id:5,hex:"#ff9ff3"},{id:6,hex:"#1dd1a1"},{id:7,hex:"#2f3542"}],
+   regions:[{n:3,d:"M15,15 H485 V485 H15 Z"},{n:1,d:"M280,80 C380,100 440,200 420,310 C400,410 300,460 200,430 C280,380 320,280 300,180 C290,130 280,100 280,80 Z"},{n:2,d:"M300,120 C370,140 410,220 390,300 C370,370 300,410 230,390 C290,350 320,270 310,190 C305,150 300,130 300,120 Z"},{n:5,d:"M120,100 C150,70 190,90 180,130 C155,145 125,130 120,100 Z"},{n:4,d:"M380,380 C350,420 300,410 310,360 C340,350 375,365 380,380 Z"},{n:6,d:"M90,350 C120,310 170,330 155,380 C125,395 95,375 90,350 Z"},{n:7,d:"M400,120 C420,100 450,115 440,145 C420,155 400,140 400,120 Z"}]},
+  {name:"🍎 Manzana",emoji:"🍎",colors:[{id:1,hex:"#e94560"},{id:2,hex:"#ff6b6b"},{id:3,hex:"#1dd1a1"},{id:4,hex:"#54a0ff"},{id:5,hex:"#feca57"},{id:6,hex:"#5f27cd"},{id:7,hex:"#2f3542"}],
+   regions:[{n:4,d:"M15,15 H485 V485 H15 Z"},{n:1,d:"M250,140 C340,140 400,210 400,300 C400,390 340,450 250,450 C160,450 100,390 100,300 C100,210 160,140 250,140 Z"},{n:2,d:"M180,200 C180,170 210,155 240,170 C250,190 230,220 200,225 C180,220 180,210 180,200 Z"},{n:3,d:"M240,120 C250,80 280,70 290,110 C270,130 245,135 240,120 Z"},{n:7,d:"M250,90 L255,140 L260,90 Z"},{n:5,d:"M120,100 C150,70 190,85 180,125 C155,140 125,125 120,100 Z"},{n:6,d:"M380,380 C350,420 300,410 310,360 C340,350 375,365 380,380 Z"}]}
+];
+
+let current=0,selected=null,filled={},history=[];
+let scale=1,ox=0,oy=0,panning=false,sx,sy,lox,loy;
+let isPreview = true; // modo preview (imagen terminada)
+
+const home=document.getElementById('home'),game=document.getElementById('game');
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const palette=document.getElementById('palette'),gallery=document.getElementById('gallery');
+const toast=document.getElementById('toast'),progFill=document.getElementById('progFill');
+const progText=document.getElementById('progText'),pageTitle=document.getElementById('pageTitle');
+const completeOverlay=document.getElementById('completeOverlay'),canvasWrap=document.getElementById('canvasWrap');
+const startOverlay=document.getElementById('startOverlay');
+const BASE=500;
+
+function buildGallery(){
+  gallery.innerHTML='';
+  pages.forEach((p,i)=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML=`<div class="card-preview">\( {p.emoji}</div><div class="card-info"><h3> \){p.name}</h3><span>${p.regions.length} zonas</span></div>`;
+    card.onclick=()=>openPage(i);
+    gallery.appendChild(card);
+  });
+}
+
+function openPage(i){
+  current=i; selected=null; filled={}; history=[];
+  scale=1; ox=0; oy=0;
+  isPreview = true; // Empezamos en modo preview
+  pageTitle.textContent=pages[i].name;
+  home.classList.add('hidden');
+  setTimeout(()=>{
+    home.style.display='none';
+    game.classList.add('active');
+    // Rellenar todo para mostrar la imagen terminada
+    fillAllForPreview();
+    startOverlay.classList.remove('hidden');
+    resize(); renderPalette(); draw(); updateProgress();
+    completeOverlay.classList.remove('show');
+  },280);
+}
+
+function fillAllForPreview(){
+  const page = pages[current];
+  page.regions.forEach((_,i)=>{
+    filled[current+'-'+i] = true;
+  });
+}
+
+function startColoring(){
+  // Vaciar todo → imagen en blanco con números
+  filled = {};
+  history = [];
+  selected = null;
+  isPreview = false;
+  startOverlay.classList.add('hidden');
+  draw();
+  updateProgress();
+  renderPalette();
+  showToast('¡Ahora colorea tú!');
+}
+
+function goHome(){
+  game.classList.remove('active');
+  home.style.display='flex';
+  requestAnimationFrame(()=>home.classList.remove('hidden'));
+}
+
+function resize(){
+  const maxW=canvasWrap.clientWidth-16,maxH=canvasWrap.clientHeight-16;
+  const size=Math.min(maxW,maxH,560);
+  cv.style.width=size+'px'; cv.style.height=size+'px';
+  cv.width=BASE; cv.height=BASE; draw();
+}
+
+function draw(){
+  const page=pages[current];
+  ctx.save(); ctx.clearRect(0,0,BASE,BASE); ctx.fillStyle='#fff'; ctx.fillRect(0,0,BASE,BASE);
+  ctx.translate(ox,oy); ctx.scale(scale,scale);
+
+  page.regions.forEach((r,i)=>{
+    const key=current+'-'+i;
+    const done = !!filled[key];
+    const path=new Path2D(r.d);
+
+    if(done){
+      ctx.fillStyle = getHex(r.n);
+      ctx.fill(path);
+    } else {
+      // Solo resaltar si no estamos en preview
+      ctx.fillStyle = (!isPreview && selected===r.n) ? hexA(getHex(r.n),0.43) : '#f1f5f9';
+      ctx.fill(path);
+    }
+    ctx.strokeStyle='#1e293b';
+    ctx.lineWidt
