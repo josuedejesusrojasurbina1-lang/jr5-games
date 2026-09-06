@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JR5 Games</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #10131a;
+      color: white;
+    }
+
+    header {
+      background: #171b24;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 2px solid #252b38;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    header p {
+      color: #aeb5c2;
+      margin-bottom: 0;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 25px;
+    }
+
+    .games {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .game {
+      background: #1b202b;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid #2b3240;
+    }
+
+    .game-icon {
+      font-size: 55px;
+    }
+
+    .game h2 {
+      margin: 10px 0;
+    }
+
+    .game p {
+      color: #aeb5c2;
+    }
+
+    .play {
+      display: inline-block;
+      padding: 12px 25px;
+      background: #20c76b;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .play:active {
+      transform: scale(0.95);
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>🎮 JR5 GAMES</h1>
+    <p>Juega gratis a mis videojuegos</p>
+  </header>
+
+  <main class="container">
+
+    <h2>🔥 Mis juegos</h2>
+
+    <div class="games">
+
+      <div class="game">
+        <div class="game-icon">🏃</div>
+        <h2>Mi primer juego</h2>
+        <p>Un videojuego HTML creado por mí.</p>
+        <a class="play" href="juego1.html">JUGAR ▶</a>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer>
+    © 2026 JR5 Games
+  </footer>
+
+</body>
+</html>
