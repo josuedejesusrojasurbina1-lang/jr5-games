@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Space Dodge</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+    background:#020713;
+    color:white;
+    touch-action:none;
+}
+
+button{
+    border:0;
+    cursor:pointer;
+}
+
+
+/* MENU */
+
+#menu{
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    background:
+    radial-gradient(
+        circle,
+        #164a7a,
+        #061426 50%,
+        #01040a
+    );
+}
+
+#title{
+    font-size:48px;
+    font-weight:bold;
+    letter-spacing:3px;
+
+    text-shadow:
+    0 0 10px #36baff,
+    0 0 30px #087cff;
+}
+
+#subtitle{
+    margin-top:10px;
+    color:#9fc4df;
+}
+
+#start{
+    margin-top:35px;
+
+    width:220px;
+    height:65px;
+
+    border-radius:16px;
+
+    background:#19c967;
+    color:white;
+
+    font-size:24px;
+    font-weight:bold;
+
+    box-shadow:
+    0 5px 0 #08743a,
+    0 0 25px #19c96766;
+}
+
+#start:active{
+    transform:translateY(5px);
+    box-shadow:0 0 0 #08743a;
+}
+
+
+/* JUEGO */
+
+#game{
+    position:absolute;
+    inset:0;
+
+    display:none;
+
+    overflow:hidden;
+
+    background:
+    radial-gradient(
+        circle at 50% 0%,
+        #153d67,
+        #071528 45%,
+        #01040a
+    );
+}
+
+
+/* ESTRELLAS */
+
+.star{
+    position:absolute;
+
+    width:2px;
+    height:2px;
+
+    border-radius:50%;
+
+    background:white;
+}
+
+
+/* HUD */
+
+#hud{
+    position:absolute;
+
+    top:12px;
+    left:12px;
+    right:12px;
+
+    display:flex;
+    justify-content:space-between;
+
+    z-index:20;
+}
+
+.info{
+    padding:10px 14px;
+
+    border-radius:12px;
+
+    background:#06152adf;
+
+    border:1px solid #315574;
+}
+
+#pause{
+    width:48px;
+    height:48px;
+
+    border-radius:12px;
+
+    background:#245779;
+
+    color:white;
+
+    font-size:20px;
+}
+
+
+/* NAVE */
+
+#player{
+    position:absolute;
+
+    width:90px;
+    height:100px;
+
+    left:50%;
+    bottom:18%;
+
+    transform:translateX(-50%);
+
+    z-index:10;
+}
+
+.body{
+    position:absolute;
+
+    left:25px;
+    top:0;
+
+    width:40px;
+    height:78px;
+
+    background:linear-gradient(
+        90deg,
+        #3989b8,
+        white,
+        #3989b8
+    );
+
+    clip-path:polygon(
+        50% 0,
+        100% 100%,
+        50% 80%,
+        0 100%
+    );
+
+    filter:drop-shadow(
+        0 0 10px #36c5ff
+    );
+}
+
+.window{
+    position:absolute;
+
+    left:32px;
+    top:23px;
+
+    width:26px;
+    height:26px;
+
+    border-radius:50%;
+
+    background:
+    radial-gradient(
+        circle at 30% 25%,
+        #b8f4ff,
+        #17618a
+    );
+
+    border:2px solid white;
+}
+
+.wing{
+    position:absolute;
+
+    top:50px;
+
+    width:35px;
+    height:35px;
+
+    background:#2c80ae;
+
+    filter:drop-shadow(
+        0 0 7px #21baff
+    );
+}
+
+.leftWing{
+    left:0;
+
+    clip-path:polygon(
+        100% 0,
+        100% 100%,
+        0 100%
+    );
+}
+
+.rightWing{
+    right:0;
+
+    clip-path:polygon(
+        0 0,
+        100% 100%,
+        0 100%
+    );
+}
+
+.engine{
+    position:absolute;
+
+    left:35px;
+    bottom:0;
+
+    width:20px;
+    height:30px;
+
+    background:linear-gradient(
+        white,
+        yellow,
+        orange,
+        red
+    );
+
+    clip-path:polygon(
+        50% 100%,
+        0 0,
+        100% 0
+    );
+
+    filter:drop-shadow(
+        0 0 10px orange
+    );
+}
+
+
+/* MONEDA */
+
+.coin{
+    position:absolute;
+
+    width:42px;
+    height:42px;
+
+    border-radius:50%;
+
+    background:
+    radial-gradient(
+        circle at 30% 25%,
+        #fff7a0,
+        #ffd21c,
+        #d88b00
+    );
+
+    border:2px solid #fff2a0;
+
+    box-shadow:
+    0 0 15px #ffc400;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    color:#815700;
+
+    font-weight:bold;
+    font-size:20px;
+}
+
+
+/* PELIGRO */
+
+.hazard{
+    position:absolute;
+
+    width:42px;
+    height:42px;
+
+    border-radius:50%;
+
+    background:
+    radial-gradient(
+        circle at 30% 25%,
+        #ff8b8b,
+        #ff2020,
+        #850000
+    );
+
+    border:2px solid #ff8585;
+
+    box-shadow:
+    0 0 18px #ff2222;
+}
+
+.hazard:after{
+    content:"";
+
+    position:absolute;
+
+    width:12px;
+    height:12px;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    border-radius:50%;
+
+    background:#4d0000;
+}
+
+
+/* CONTROLES */
+
+#controls{
+    position:absolute;
+
+    left:0;
+    right:0;
+    bottom:22px;
+
+    display:flex;
+    justify-content:space-between;
+
+    padding:0 25px;
+
+    z-index:30;
+}
+
+.control{
+    width:85px;
+    height:75px;
+
+    border-radius:20px;
+
+    background:#214f70;
+
+    border:2px solid #5f96bb;
+
+    color:white;
+
+    font-size:32px;
+
+    box-shadow:
+    0 5px 0 #0a263c;
+}
+
+.control:active{
+    transform:translateY(5px);
+}
+
+
+/* PANTALLAS */
+
+.screen{
+    position:absolute;
+
+    inset:0;
+
+    z-index:50;
+
+    display:none;
+
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+
+    background:#020713ee;
+}
+
+.screen h2{
+    font-size:42px;
+    margin-bottom:20px;
+}
+
+.action{
+    width:200px;
+    height:55px;
+
+    margin:6px;
+
+    border-radius:14px;
+
+    background:#2086cf;
+
+    color:white;
+
+    font-size:18px;
+    font-weight:bold;
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<div id="menu">
+
+    <div id="title">
+        SPACE DODGE
+    </div>
+
+    <div id="subtitle">
+        Esquiva y consigue monedas
+    </div>
+
+    <button id="start">
+        JUGAR
+    </button>
+
+</div>
+
+
+<div id="game">
+
+    <div id="hud">
+
+        <div class="info">
+            🪙 <span id="score">0</span>
+            &nbsp;&nbsp;
+            ❤️ <span id="lives">3</span>
+        </div>
+
+        <button id="pause">
+            Ⅱ
+        </button>
+
+    </div>
+
+
+    <div id="player">
+
+        <div class="wing leftWing"></div>
+        <div class="wing rightWing"></div>
+
+        <div class="body"></div>
+
+        <div class="window"></div>
+
+        <div class="engine"></div>
+
+    </div>
+
+
+    <div id="objects"></div>
+
+
+    <div id="controls">
+
+        <button
+            class="control"
+            id="left">
+            ◀
+        </button>
+
+        <button
+            class="control"
+            id="right">
+            ▶
+        </button>
+
+    </div>
+
+
+    <div
+        id="pauseScreen"
+        class="screen">
+
+        <h2>
+            PAUSA
+        </h2>
+
+        <button
+            class="action"
+            id="resume">
+            CONTINUAR
+        </button>
+
+        <button
+            class="action"
+            id="menuButton">
+            MENÚ
+        </button>
+
+    </div>
+
+
+    <div
+        id="gameOver"
+        class="screen">
+
+        <h2>
+            GAME OVER
+        </h2>
+
+        <p>
+            Monedas:
+            <span id="finalScore">
+                0
+            </span>
+        </p>
+
+        <br>
+
+        <button
+            class="action"
+            id="restart">
+            REINTENTAR
+        </button>
+
+        <button
+            class="action"
+            id="gameMenu">
+            MENÚ
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const menu =
+document.getElementById("menu");
+
+const game =
+document.getElementById("game");
+
+const start =
+document.getElementById("start");
+
+const player =
+document.getElementById("player");
+
+const objects =
+document.getElementById("objects");
+
+const scoreText =
+document.getElementById("score");
+
+const livesText =
+document.getElementById("lives");
+
+const left =
+document.getElementById("left");
+
+const right =
+document.getElementById("right");
+
+const pause =
+document.getElementById("pause");
+
+const pauseScreen =
+document.getElementById("pauseScreen");
+
+const gameOver =
+document.getElementById("gameOver");
+
+const resume =
+document.getElementById("resume");
+
+const restart =
+document.getElementById("restart");
+
+const menuButton =
+document.getElementById("menuButton");
+
+const gameMenu =
+document.getElementById("gameMenu");
+
+const finalScore =
+document.getElementById("finalScore");
+
+
+let running = false;
+
+let paused = false;
+
+let score = 0;
+
+let lives = 3;
+
+let playerX = 50;
+
+let lastTime = 0;
+
+let spawnTime = 0;
+
+let items = [];
+
+
+/* ESTRELLAS */
+
+function stars(){
+
+    for(let i=0;i<70;i++){
+
+        const s =
+        document.createElement("div");
+
+        s.className =
+        "star";
+
+        s.style.left =
+        Math.random()*100+"%";
+
+        s.style.top =
+        Math.random()*100+"%";
+
+        s.style.opacity =
+        Math.random();
+
+        game.appendChild(s);
+
+    }
+
+}
+
+
+/* MOVER */
+
+function moveLeft(){
+
+    if(!running || paused)
+    return;
+
+    playerX -= 20;
+
+    if(playerX < 8)
+    playerX = 8;
+
+    player.style.left =
+    playerX+"%";
+
+}
+
+
+function moveRight(){
+
+    if(!running || paused)
+    return;
+
+    playerX += 20;
+
+    if(playerX > 92)
+    playerX = 92;
+
+    player.style.left =
+    playerX+"%";
+
+}
+
+
+/* CREAR MONEDA */
+
+function coin(x){
+
+    const e =
+    document.createElement("div");
+
+    e.className =
+    "coin";
+
+    e.textContent =
+    "$";
+
+    e.style.left =
+    x+"%";
+
+    e.style.top =
+    "-50px";
+
+    objects.appendChild(e);
+
+    items.push({
+
+        element:e,
+
+        type:"coin",
+
+        x:x,
+
+        y:-50,
+
+        speed:190
+
+    });
+
+}
+
+
+/* CREAR PELIGRO */
+
+function hazard(x){
+
+    const e =
+    document.createElement("div");
+
+    e.className =
+    "hazard";
+
+    e.style.left =
+    x+"%";
+
+    e.style.top =
+    "-50px";
+
+    objects.appendChild(e);
+
+    items.push({
+
+        element:e,
+
+        type:"hazard",
+
+        x:x,
+
+        y:-50,
+
+        speed:210
+
+    });
+
+}
+
+
+/* GENERAR */
+
+function spawn(){
+
+    const coinX =
+    10 + Math.random()*80;
+
+    let hazardX;
+
+    do{
+
+        hazardX =
+        8 + Math.random()*84;
+
+    }
+    while(
+        Math.abs(
+            hazardX-coinX
+        ) < 30
+    );
+
+    coin(coinX);
+
+    hazard(hazardX);
+
+}
+
+
+/* COLISIÓN */
+
+function hit(a,b){
+
+    const A =
+    a.getBoundingClientRect();
+
+    const B =
+    b.getBoundingClientRect();
+
+    return !(
+        A.right < B.left ||
+        A.left > B.right ||
+        A.bottom < B.top ||
+        A.top > B.bottom
+    );
+
+}
+
+
+/* ACTUALIZAR */
+
+function update(dt){
+
+    for(
+        let i=items.length-1;
+        i>=0;
+        i--
+    ){
+
+        const item =
+        items[i];
+
+        item.y +=
+        item.speed*dt;
+
+        item.element.style.top =
+        item.y+"px";
+
+
+        if(
+            hit(
+                player,
+                item.element
+            )
+        ){
+
+            if(
+                item.type === "coin"
+            ){
+
+                score++;
+
+                scoreText.textContent =
+                score;
+
+            }
+            else{
+
+                lives--;
+
+                livesText.textContent =
+                lives;
+
+                if(lives<=0){
+
+                    endGame();
+
+                    return;
+
+                }
+
+            }
+
+
+            item.element.remove();
+
+            items.splice(i,1);
+
+            continue;
+
+        }
+
+
+        if(
+            item.y >
+            game.clientHeight+80
+        ){
+
+            item.element.remove();
+
+            items.splice(i,1);
+
+        }
+
+    }
+
+}
+
+
+/* BUCLE */
+
+function loop(time){
+
+    if(!running)
+    return;
+
+    if(!lastTime)
+    lastTime=time;
+
+    const dt =
+    Math.min(
+        (time-lastTime)/1000,
+        .04
+    );
+
+    lastTime=time;
+
+
+    if(!paused){
+
+        spawnTime += dt;
+
+        if(spawnTime >= .9){
+
+            spawnTime=0;
+
+            spawn();
+
+        }
+
+        update(dt);
+
+    }
+
+
+    requestAnimationFrame(loop);
+
+}
+
+
+/* INICIAR */
+
+function startGame(){
+
+    menu.style.display =
+    "none";
+
+    game.style.display =
+    "block";
+
+    pauseScreen.style.display =
+    "none";
+
+    gameOver.style.display =
+    "none";
+
+
+    objects.innerHTML =
+    "";
+
+    items=[];
+
+    score=0;
+
+    lives=3;
+
+    playerX=50;
+
+    scoreText.textContent="0";
+
+    livesText.textContent="3";
+
+    player.style.left="50%";
+
+    running=true;
+
+    paused=false;
+
+    lastTime=0;
+
+    spawnTime=0;
+
+    requestAnimationFrame(loop);
+
+}
+
+
+/* GAME OVER */
+
+function endGame(){
+
+    running=false;
+
+    finalScore.textContent =
+    score;
+
+    gameOver.style.display =
+    "flex";
+
+}
+
+
+/* PAUSA */
+
+function togglePause(){
+
+    if(!running)
+    return;
+
+    paused=!paused;
+
+    pauseScreen.style.display =
+    paused ? "flex" : "none";
+
+    if(!paused){
+
+        lastTime =
+        performance.now();
+
+    }
+
+}
+
+
+/* VOLVER AL MENÚ */
+
+function backMenu(){
+
+    running=false;
+
+    paused=false;
+
+    items=[];
+
+    objects.innerHTML="";
+
+    game.style.display="none";
+
+    pauseScreen.style.display="none";
+
+    gameOver.style.display="none";
+
+    menu.style.display="flex";
+
+}
+
+
+/* BOTONES */
+
+start.onclick =
+startGame;
+
+left.onclick =
+moveLeft;
+
+right.onclick =
+moveRight;
+
+pause.onclick =
+togglePause;
+
+resume.onclick =
+togglePause;
+
+restart.onclick =
+startGame;
+
+menuButton.onclick =
+backMenu;
+
+gameMenu.onclick =
+backMenu;
+
+
+/* TECLADO */
+
+document.addEventListener(
+"keydown",
+function(e){
+
+    if(
+        e.key==="ArrowLeft" ||
+        e.key.toLowerCase()==="a"
+    ){
+
+        moveLeft();
+
+    }
+
+    if(
+        e.key==="ArrowRight" ||
+        e.key.toLowerCase()==="d"
+    ){
+
+        moveRight();
+
+    }
+
+    if(
+        e.key==="Escape"
+    ){
+
+        togglePause();
+
+    }
+
+});
+
+
+stars();
+
+</script>
+
+</body>
+  </html>
