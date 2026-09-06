@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#03030b">
+
+<title>NEON MOTO X</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#020208;
+  font-family:Arial,Helvetica,sans-serif;
+  color:white;
+}
+
+#game{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  overflow:hidden;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 25%,
+      #24246f,
+      #0a0a25 45%,
+      #020207 80%
+    );
+}
+
+/* ================= CIELO ================= */
+
+.skyGlow{
+  position:absolute;
+  inset:0 0 45% 0;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 75%,
+      rgba(0,234,255,.22),
+      transparent 45%
+    );
+}
+
+.sun{
+  position:absolute;
+  left:50%;
+  top:17%;
+
+  width:90px;
+  height:90px;
+
+  transform:translate(-50%,-50%);
+
+  border-radius:50%;
+
+  background:#8df7ff;
+
+  box-shadow:
+    0 0 25px #00eaff,
+    0 0 70px #00eaff,
+    0 0 120px #00eaff66;
+}
+
+/* ================= CIUDAD ================= */
+
+.city{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:39%;
+
+  height:30%;
+
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-around;
+}
+
+.building{
+  position:relative;
+
+  width:8%;
+  height:var(--height);
+
+  min-width:25px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #080820,
+      #16164b,
+      #080820
+    );
+
+  border:1px solid #008fa5;
+
+  box-shadow:
+    0 0 12px rgba(0,234,255,.25);
+}
+
+.building::after{
+  content:"";
+
+  position:absolute;
+  inset:8px 6px;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0,234,255,.55) 0 3px,
+      transparent 3px 13px
+    );
+
+  opacity:.45;
+}
+
+.horizon{
+  position:absolute;
+
+  left:0;
+  right:0;
+
+  bottom:39%;
+
+  height:3px;
+
+  background:#00eaff;
+
+  box-shadow:
+    0 0 12px #00eaff,
+    0 0 35px #00eaff;
+
+  z-index:2;
+}
+
+/* ================= CARRETERA ================= */
+
+.road{
+  position:absolute;
+
+  left:50%;
+  bottom:-5%;
+
+  width:90%;
+  height:70%;
+
+  transform:translateX(-50%);
+
+  clip-path:polygon(
+    39% 0,
+    61% 0,
+    100% 100%,
+    0 100%
+  );
+
+  background:
+    linear-gradient(
+      90deg,
+      #05050c,
+      #16161f 50%,
+      #05050c
+    );
+
+  z-index:3;
+}
+
+.roadTexture{
+  position:absolute;
+  inset:0;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 45px,
+      rgba(255,255,255,.025) 46px 48px
+    );
+
+  animation:
+    roadMove .4s linear infinite;
+}
+
+@keyframes roadMove{
+  from{
+    background-position:0 0;
+  }
+
+  to{
+    background-position:0 70px;
+  }
+}
+
+.roadEdge{
+  position:absolute;
+
+  top:0;
+  bottom:0;
+
+  width:5px;
+
+  box-shadow:
+    0 0 15px currentColor,
+    0 0 35px currentColor;
+}
+
+.edgeL{
+  left:15%;
+  color:#00eaff;
+  background:#00eaff;
+}
+
+.edgeR{
+  right:15%;
+  color:#ff00e6;
+  background:#ff00e6;
+}
+
+/* ================= MUNDO ================= */
+
+#world{
+  position:absolute;
+  inset:0;
+
+  z-index:12;
+
+  overflow:hidden;
+}
+
+/* ================= DIAMANTES ================= */
+
+.obstacle{
+  position:absolute;
+
+  /*
+    AHORA SON MÁS GRANDES
+  */
+
+  width:30px;
+  height:30px;
+
+  transform:
+    translate(-50%,-50%)
+    rotate(45deg);
+
+  border:3px solid #fff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff006a,
+      #8d00ff 45%,
+      #00eaff
+    );
+
+  box-shadow:
+    0 0 12px #ff00d4,
+    0 0 30px #8d00ff,
+    0 0 50px rgba(0,234,255,.6);
+
+  z-index:15;
+}
+
+.obstacle::before{
+  content:"";
+
+  position:absolute;
+
+  inset:18%;
+
+  background:#fff;
+
+  opacity:.8;
+}
+
+.obstacle::after{
+  content:"";
+
+  position:absolute;
+
+  left:50%;
+  top:100%;
+
+  width:170%;
+  height:35%;
+
+  transform:
+    translateX(-50%)
+    rotate(-45deg);
+
+  border-radius:50%;
+
+  background:rgba(0,0,0,.7);
+
+  filter:blur(5px);
+}
+
+/* ================= MOTO ================= */
+
+#bike{
+  position:absolute;
+
+  width:100px;
+  height:155px;
+
+  left:50%;
+  bottom:10%;
+
+  transform:
+    translateX(-50%);
+
+  z-index:30;
+
+  transition:
+    left .13s cubic-bezier(.2,.8,.2,1);
+}
+
+.wheel{
+  position:absolute;
+
+  left:34px;
+
+  width:32px;
+  height:54px;
+
+  border-radius:50%;
+
+  background:#020205;
+
+  border:5px solid #00eaff;
+
+  box-shadow:
+    0 0 12px #00eaff,
+    inset 0 0 10px #00eaff;
+}
+
+.frontWheel{
+  top:0;
+}
+
+.backWheel{
+  bottom:0;
+}
+
+.motoBody{
+  position:absolute;
+
+  left:27px;
+  top:38px;
+
+  width:46px;
+  height:76px;
+
+  border-radius:
+    18px 18px 9px 9px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #00eaff,
+      #365bff 45%,
+      #ff00e6
+    );
+
+  box-shadow:
+    0 0 15px #00eaff,
+    0 0 30px #ff00e6;
+}
+
+.motoCenter{
+  position:absolute;
+
+  left:35px;
+  top:50px;
+
+  width:30px;
+  height:50px;
+
+  border-radius:50%;
+
+  background:#11111c;
+
+  border:2px solid #8efaff;
+}
+
+.headlight{
+  position:absolute;
+
+  left:37px;
+  top:27px;
+
+  width:26px;
+  height:14px;
+
+  border-radius:50%;
+
+  background:#fff;
+
+  box-shadow:
+    0 0 15px white,
+    0 0 30px #00eaff;
+}
+
+.handlebar{
+  position:absolute;
+
+  left:15px;
+  top:36px;
+
+  width:70px;
+  height:7px;
+
+  border-radius:10px;
+
+  background:#888;
+}
+
+.exhaust{
+  position:absolute;
+
+  left:70px;
+  top:100px;
+
+  width:22px;
+  height:7px;
+
+  background:#aaa;
+
+  border-radius:10px;
+}
+
+.flame{
+  position:absolute;
+
+  left:80px;
+  top:99px;
+
+  width:25px;
+  height:9px;
+
+  border-radius:50%;
+
+  background:#00eaff;
+
+  box-shadow:
+    0 0 12px #00eaff,
+    0 0 25px #ff00e6;
+
+  animation:
+    flame .08s infinite alternate;
+}
+
+@keyframes flame{
+  from{
+    transform:scaleX(.7);
+  }
+
+  to{
+    transform:scaleX(1.2);
+  }
+}
+
+/* ================= VIDA ================= */
+
+#lives{
+  display:flex;
+  gap:3px;
+
+  margin-top:2px;
+
+  font-size:17px;
+}
+
+.heart{
+  transition:.2s;
+}
+
+.heart.lost{
+  opacity:.15;
+  filter:grayscale(1);
+}
+
+/* ================= HUD ================= */
+
+#hud{
+  position:absolute;
+
+  top:14px;
+  left:14px;
+  right:14px;
+
+  z-index:50;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:8px;
+}
+
+.hudBox{
+  min-width:105px;
+
+  padding:8px 12px;
+
+  border:
+    1px solid rgba(0,234,255,.8);
+
+  border-radius:12px;
+
+  background:
+    rgba(3,5,18,.82);
+
+  box-shadow:
+    0 0 15px rgba(0,234,255,.18);
+
+  backdrop-filter:blur(8px);
+}
+
+.hudLabel{
+  display:block;
+
+  font-size:9px;
+
+  color:#9ba4bb;
+
+  letter-spacing:1px;
+}
+
+.hudValue{
+  font-size:18px;
+  font-weight:900;
+}
+
+/* ================= PAUSA ================= */
+
+#pauseBtn{
+  position:absolute;
+
+  top:75px;
+  right:15px;
+
+  z-index:51;
+
+  width:45px;
+  height:45px;
+
+  border-radius:12px;
+
+  border:1px solid #ff00e6;
+
+  background:#09091bd9;
+
+  color:#fff;
+
+  font-size:20px;
+}
+
+/* ================= CONTROLES ================= */
+
+.controls{
+  position:absolute;
+
+  left:0;
+  right:0;
+  bottom:24px;
+
+  z-index:50;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  padding:0 24px;
+}
+
+.control{
+  width:76px;
+  height:76px;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  border-radius:50%;
+
+  border:2px solid #00eaff;
+
+  background:
+    radial-gradient(
+      circle,
+      #09223b,
+      #050612
+    );
+
+  color:#fff;
+
+  font-size:31px;
+  font-weight:bold;
+
+  box-shadow:
+    0 0 15px #00eaff55,
+    inset 0 0 15px #00eaff22;
+}
+
+.control:active{
+  transform:scale(.88);
+
+  background:#006eff;
+
+  box-shadow:
+    0 0 30px #00eaff;
+}
+
+/* ================= PANTALLAS ================= */
+
+.screen{
+  position:absolute;
+
+  inset:0;
+
+  z-index:100;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+  justify-content:center;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(25,30,100,.88),
+      rgba(2,2,8,.97) 70%
+    );
+
+  backdrop-filter:blur(4px);
+}
+
+.logo{
+  font-size:
+    clamp(38px,10vw,65px);
+
+  font-weight:1000;
+
+  font-style:italic;
+
+  letter-spacing:-3px;
+
+  color:#00eaff;
+
+  text-shadow:
+    0 0 10px #00eaff,
+    0 0 35px #006eff;
+}
+
+.logo span{
+  color:#ff00e6;
+}
+
+.tagline{
+  margin-top:8px;
+
+  color:#aab0c9;
+
+  letter-spacing:5px;
+
+  font-size:11px;
+}
+
+.menuCard{
+  width:min(88%,380px);
+
+  margin-top:35px;
+
+  padding:22px;
+
+  border:
+    1px solid #00eaff66;
+
+  border-radius:22px;
+
+  background:#050611d9;
+
+  box-shadow:
+    0 0 40px rgba(0,234,255,.1);
+
+  text-align:center;
+}
+
+.mainButton{
+  width:100%;
+
+  padding:17px;
+
+  margin-top:9px;
+
+  border:
+    2px solid #00eaff;
+
+  border-radius:15px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #06314c,
+      #102d75,
+      #480a55
+    );
+
+  color:#fff;
+
+  font-size:18px;
+
+  font-weight:900;
+
+  letter-spacing:1px;
+
+  box-shadow:
+    0 0 20px #00eaff55;
+}
+
+.mainButton:active{
+  transform:scale(.96);
+}
+
+.info{
+  margin-top:17px;
+
+  font-size:12px;
+
+  color:#858ca5;
+
+  line-height:1.7;
+}
+
+/* ================= GAME OVER ================= */
+
+#gameOver,
+#pauseScreen{
+  display:none;
+}
+
+.gameOverTitle{
+  font-size:45px;
+
+  font-weight:1000;
+
+  color:#ff176e;
+
+  text-shadow:
+    0 0 15px #ff006a,
+    0 0 40px #ff006a66;
+}
+
+.result{
+  margin:15px 0;
+
+  text-align:center;
+
+  color:#aaa;
+}
+
+.result strong{
+  display:block;
+
+  font-size:35px;
+
+  color:#fff;
+
+  margin-top:5px;
+}
+
+.newRecord{
+  display:none;
+
+  margin-bottom:10px;
+
+  color:#00eaff;
+
+  font-weight:bold;
+
+  text-shadow:
+    0 0 12px #00eaff;
+}
+
+/* ================= TEMBLOR ================= */
+
+.shake1{
+  animation:
+    shakeLight .28s linear;
+}
+
+.shake2{
+  animation:
+    shakeMedium .45s linear;
+}
+
+.shake3{
+  animation:
+    shakeHard .8s linear;
+}
+
+@keyframes shakeLight{
+
+  0%,100%{
+    transform:translateX(-50%);
+  }
+
+  20%{
+    transform:translateX(calc(-50% - 5px));
+  }
+
+  40%{
+    transform:translateX(calc(-50% + 5px));
+  }
+
+  60%{
+    transform:translateX(calc(-50% - 4px));
+  }
+
+  80%{
+    transform:translateX(calc(-50% + 4px));
+  }
+}
+
+@keyframes shakeMedium{
+
+  0%,100%{
+    transform:translateX(-50%);
+  }
+
+  10%{
+    transform:translateX(calc(-50% - 9px)) rotate(-4deg);
+  }
+
+  25%{
+    transform:translateX(calc(-50% + 9px)) rotate(4deg);
+  }
+
+  40%{
+    transform:translateX(calc(-50% - 8px)) rotate(-5deg);
+  }
+
+  55%{
+    transform:translateX(calc(-50% + 8px)) rotate(5deg);
+  }
+
+  70%{
+    transform:translateX(calc(-50% - 5px));
+  }
+
+  85%{
+    transform:translateX(calc(-50% + 5px));
+  }
+}
+
+@keyframes shakeHard{
+
+  0%,100%{
+    transform:translateX(-50%) rotate(0);
+  }
+
+  10%{
+    transform:translateX(calc(-50% - 14px)) rotate(-8deg);
+  }
+
+  20%{
+    transform:translateX(calc(-50% + 14px)) rotate(8deg);
+  }
+
+  30%{
+    transform:translateX(calc(-50% - 12px)) rotate(-10deg);
+  }
+
+  40%{
+    transform:translateX(calc(-50% + 12px)) rotate(10deg);
+  }
+
+  55%{
+    transform:translateX(calc(-50% - 9px)) rotate(-7deg);
+  }
+
+  70%{
+    transform:translateX(calc(-50% + 9px)) rotate(7deg);
+  }
+
+  85%{
+    transform:translateX(calc(-50% - 5px));
+  }
+}
+
+/* ================= EXPLOSIÓN ================= */
+
+.explosion{
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:30px;
+  height:30px;
+
+  border-radius:50%;
+
+  background:#fff;
+
+  box-shadow:
+    0 0 20px #fff,
+    0 0 45px #00eaff,
+    0 0 80px #ff00e6,
+    0 0 130px #ff0055;
+
+  transform:translate(-50%,-50%);
+
+  z-index:80;
+
+  animation:
+    explode .7s ease-out forwards;
+}
+
+@keyframes explode{
+
+  0%{
+    opacity:1;
+    transform:
+      translate(-50%,-50%)
+      scale(.5);
+  }
+
+  60%{
+    opacity:1;
+    transform:
+      translate(-50%,-50%)
+      scale(7);
+  }
+
+  100%{
+    opacity:0;
+    transform:
+      translate(-50%,-50%)
+      scale(11);
+  }
+}
+
+#flash{
+  position:absolute;
+
+  inset:0;
+
+  z-index:90;
+
+  pointer-events:none;
+
+  background:#ff005d;
+
+  opacity:0;
+}
+
+.flash{
+  animation:
+    hitFlash .35s;
+}
+
+@keyframes hitFlash{
+  0%{
+    opacity:.4;
+  }
+
+  100%{
+    opacity:0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+  <div class="skyGlow"></div>
+  <div class="sun"></div>
+
+  <div class="city">
+
+    <div class="building" style="--height:65%"></div>
+    <div class="building" style="--height:42%"></div>
+    <div class="building" style="--height:82%"></div>
+    <div class="building" style="--height:53%"></div>
+    <div class="building" style="--height:72%"></div>
+    <div class="building" style="--height:47%"></div>
+    <div class="building" style="--height:88%"></div>
+    <div class="building" style="--height:57%"></div>
+
+  </div>
+
+  <div class="horizon"></div>
+
+  <div class="road">
+
+    <div class="roadTexture"></div>
+
+    <div class="roadEdge edgeL"></div>
+    <div class="roadEdge edgeR"></div>
+
+  </div>
+
+  <div id="world"></div>
+
+  <!-- MOTO -->
+
+  <div id="bike">
+
+    <div class="wheel frontWheel"></div>
+    <div class="wheel backWheel"></div>
+
+    <div class="handlebar"></div>
+
+    <div class="headlight"></div>
+
+    <div class="motoBody"></div>
+
+    <div class="motoCenter"></div>
+
+    <div class="exhaust"></div>
+
+    <div class="flame"></div>
+
+  </div>
+
+
+  <!-- HUD -->
+
+  <div id="hud">
+
+    <div class="hudBox">
+
+      <span class="hudLabel">
+        PUNTOS
+      </span>
+
+      <span class="hudValue"
+            id="score">
+        0
+      </span>
+
+    </div>
+
+
+    <div class="hudBox">
+
+      <span class="hudLabel">
+        VIDAS
+      </span>
+
+      <div id="lives">
+
+        <span class="heart">❤️</span>
+        <span class="heart">❤️</span>
+        <span class="heart">❤️</span>
+
+      </div>
+
+    </div>
+
+
+    <div class="hudBox">
+
+      <span class="hudLabel">
+        VELOCIDAD
+      </span>
+
+      <span class="hudValue">
+
+        <span id="speed">
+          240
+        </span>
+
+        KM/H
+
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <button id="pauseBtn">
+    Ⅱ
+  </button>
+
+
+  <!-- CONTROLES -->
+
+  <div class="controls">
+
+    <div class="control"
+         id="leftBtn">
+      ◀
+    </div>
+
+    <div class="control"
+         id="rightBtn">
+      ▶
+    </div>
+
+  </div>
+
+
+  <!-- MENÚ -->
+
+  <div class="screen"
+       id="menu">
+
+    <div class="logo">
+      NEON <span>MOTO</span>
+    </div>
+
+    <div class="tagline">
+      FUTURE RACING
+    </div>
+
+    <div class="menuCard">
+
+      <button class="mainButton"
+              id="startBtn">
+        ▶ JUGAR
+      </button>
+
+      <div class="info">
+
+        🏍️ Moto automática<br>
+        ❤️ 3 vidas<br>
+        💎 Evita los obstáculos<br>
+        ⚡ La velocidad aumenta
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- PAUSA -->
+
+  <div class="screen"
+       id="pauseScreen">
+
+    <div class="logo"
+         style="font-size:42px">
+
+      PAUSA
+
+    </div>
+
+    <div class="menuCard">
+
+      <button class="mainButton"
+              id="resumeBtn">
+
+        ▶ CONTINUAR
+
+      </button>
+
+      <button class="mainButton"
+              id="pauseMenuBtn">
+
+        MENÚ PRINCIPAL
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- GAME OVER -->
+
+  <div class="screen"
+       id="gameOver">
+
+    <div class="gameOverTitle">
+      GAME OVER
+    </div>
+
+    <div class="result">
+
+      PUNTUACIÓN
+
+      <strong id="finalScore">
+        0
+      </strong>
+
+    </div>
+
+    <div class="newRecord"
+         id="newRecord">
+
+      ★ NUEVO RÉCORD ★
+
+    </div>
+
+    <div class="menuCard">
+
+      <button class="mainButton"
+              id="retryBtn">
+
+        ↻ VOLVER A INTENTAR
+
+      </button>
+
+      <button class="mainButton"
+              id="gameMenuBtn">
+
+        MENÚ PRINCIPAL
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div id="flash"></div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   NEON MOTO X
+   SISTEMA DE 3 VIDAS
+===================================================== */
+
+const game =
+document.getElementById("game");
+
+const world =
+document.getElementById("world");
+
+const bike =
+document.getElementById("bike");
+
+const menu =
+document.getElementById("menu");
+
+const gameOver =
+document.getElementById("gameOver");
+
+const pauseScreen =
+document.getElementById("pauseScreen");
+
+const startBtn =
+document.getElementById("startBtn");
+
+const retryBtn =
+document.getElementById("retryBtn");
+
+const gameMenuBtn =
+document.getElementById("gameMenuBtn");
+
+const pauseBtn =
+document.getElementById("pauseBtn");
+
+const resumeBtn =
+document.getElementById("resumeBtn");
+
+const pauseMenuBtn =
+document.getElementById("pauseMenuBtn");
+
+const leftBtn =
+document.getElementById("leftBtn");
+
+const rightBtn =
+document.getElementById("rightBtn");
+
+const scoreText =
+document.getElementById("score");
+
+const finalScoreText =
+document.getElementById("finalScore");
+
+const speedText =
+document.getElementById("speed");
+
+const hearts =
+document.querySelectorAll(".heart");
+
+const newRecord =
+document.getElementById("newRecord");
+
+const flash =
+document.getElementById("flash");
+
+
+/* ================= ESTADO ================= */
+
+let playing=false;
+
+let paused=false;
+
+let lane=1;
+
+let score=0;
+
+let speed=240;
+
+let lastTime=0;
+
+let spawnTimer=0;
+
+let spawnDelay=1300;
+
+let obstacles=[];
+
+let lastLane=-1;
+
+
+/*
+   IMPORTANTE:
+
+   Ahora tenemos 3 vidas.
+*/
+
+let lives=3;
+
+
+/*
+   Protección después
+   de recibir un golpe.
+
+   Evita que te maten dos veces
+   instantáneamente.
+*/
+
+let invincible=false;
+
+let invincibleTime=0;
+
+
+let bestScore=
+Number(
+  localStorage.getItem(
+    "neonMotoBest"
+  ) || 0
+);
+
+
+/* ================= CARRILES ================= */
+
+const lanes=[
+  36,
+  50,
+  64
+];
+
+
+/* ================= SONIDO ================= */
+
+let audioContext=null;
+
+function sound(type){
+
+  try{
+
+    if(!audioContext){
+
+      audioContext=
+        new(
+          window.AudioContext ||
+          window.webkitAudioContext
+        )();
+
+    }
+
+    const osc=
+      audioContext.createOscillator();
+
+    const gain=
+      audioContext.createGain();
+
+    osc.connect(gain);
+
+    gain.connect(
+      audioContext.destination
+    );
+
+    const now=
+      audioContext.currentTime;
+
+
+    if(type==="move"){
+
+      osc.frequency.setValueAtTime(
+        180,
+        now
+      );
+
+      osc.frequency.exponentialRampToValueAtTime(
+        80,
+        now+.08
+      );
+
+    }
+
+
+    if(type==="hit"){
+
+      osc.frequency.setValueAtTime(
+        120,
+        now
+      );
+
+      osc.frequency.exponentialRampToValueAtTime(
+        35,
+        now+.3
+      );
+
+    }
+
+
+    if(type==="explode"){
+
+      osc.frequency.setValueAtTime(
+        180,
+        now
+      );
+
+      osc.frequency.exponentialRampToValueAtTime(
+        25,
+        now+.7
+      );
+
+    }
+
+
+    if(type==="start"){
+
+      osc.frequency.setValueAtTime(
+        180,
+        now
+      );
+
+      osc.frequency.exponentialRampToValueAtTime(
+        650,
+        now+.25
+      );
+
+    }
+
+
+    gain.gain.setValueAtTime(
+      .001,
+      now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      .12,
+      now+.01
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      .001,
+      now+.35
+    );
+
+    osc.start(now);
+
+    osc.stop(
+      now+.36
+    );
+
+  }catch(e){}
+
+}
+
+
+/* ================= DIRECCIÓN ================= */
+
+function moveLeft(){
+
+  if(!playing || paused)
+    return;
+
+  if(lane>0){
+
+    lane--;
+
+    bike.style.left=
+      lanes[lane]+"%";
+
+    sound("move");
+  }
+
+}
+
+
+function moveRight(){
+
+  if(!playing || paused)
+    return;
+
+  if(lane<2){
+
+    lane++;
+
+    bike.style.left=
+      lanes[lane]+"%";
+
+    sound("move");
+  }
+
+}
+
+
+/* ================= CONTROLES ================= */
+
+leftBtn.addEventListener(
+  "pointerdown",
+  e=>{
+    e.preventDefault();
+    moveLeft();
+  }
+);
+
+rightBtn.addEventListener(
+  "pointerdown",
+  e=>{
+    e.preventDefault();
+    moveRight();
+  }
+);
+
+
+/* ================= TECLADO ================= */
+
+document.addEventListener(
+  "keydown",
+  e=>{
+
+    if(
+      e.key==="ArrowLeft" ||
+      e.key==="a"
+    ){
+      moveLeft();
+    }
+
+    if(
+      e.key==="ArrowRight" ||
+      e.key==="d"
+    ){
+      moveRight();
+    }
+
+    if(
+      e.key==="Escape" ||
+      e.key==="p"
+    ){
+      togglePause();
+    }
+
+  }
+);
+
+
+/* ================= CARRIL ALEATORIO ================= */
+
+function chooseLane(){
+
+  let available=
+    [0,1,2].filter(
+      x=>x!==lastLane
+    );
+
+  if(!available.length)
+    available=[0,1,2];
+
+  return available[
+    Math.floor(
+      Math.rand
